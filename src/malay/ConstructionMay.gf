@@ -1,4 +1,4 @@
-concrete ConstructionMay of Construction = CatMay ** open ParadigmsMay, (L=LexiconMay), (G=GrammarMay) in {
+concrete ConstructionMay of Construction = CatMay ** open ParadigmsMay, (L=LexiconMay), SyntaxMay in {
 
 lincat
   Timeunit = N ;
@@ -9,7 +9,7 @@ lincat
 
 lin
 
-  has_age_VP card = G.ComplSlash (G.SlashV2a umur_V2) (G.DetCN (G.DetQuant G.IndefArt (G.NumCard card)) (G.UseN L.year_N)) ;
+  has_age_VP card = mkVP umur_V2 (mkNP <lin Card card : Card> L.year_N)
 
 oper
   umur_V2 : V2 = mkV2 (mkV "umur") noPrep ;
