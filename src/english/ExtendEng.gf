@@ -450,13 +450,13 @@ lin BaseImp = twoTable2 CPolarity ImpForm ;
 
   lin
     ComplGenVV v a p vp = insertObj (\\agr => a.s ++ p.s ++
-                                         infVP v.typ vp False a.a p.p agr)
+                                         infVPAlt v.typ vp False {ant = a.a; have = a.have} p.p agr)
                                (predVV v) ;
 
     CompS s = {s = \\_ => "that" ++ s.s} ;
     CompQS qs = {s = \\_ => qs.s ! QIndir} ;
     CompVP ant p vp = {s = \\a => ant.s ++ p.s ++
-                                infVP VVInf vp False ant.a p.p a} ;
+                                infVPAlt VVInf vp False {ant = ant.a; have = ant.have} p.p a} ;
 
 -- quite specific for English anyway
 

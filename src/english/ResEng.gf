@@ -248,6 +248,9 @@ param
     Neg => CNeg b
     } ;
 
+  AnteriorityWithStr : Type =
+    {ant : Anteriority; have : Str } ;
+
   VerbForms : Type =
     Tense => Anteriority => CPolarity => Order => Agr =>
       {aux, adv, fin, inf : Str} ; -- would, not, sleeps, slept
@@ -527,8 +530,10 @@ param
     agrVerb (verb.s ! VPres) (verb.s ! VInf) ;
 
   infVP : VVType -> VP -> Bool -> Anteriority -> CPolarity -> Agr -> Str = \typ,vp,ad_pos,ant,cb,a ->
+    infVPAlt typ vp ad_pos {ant = ant; have = ""} cb a; -- TODO: Is the "" bad?
+  infVPAlt : VVType -> VP -> Bool -> AnteriorityWithStr -> CPolarity -> Agr -> Str = \typ,vp,ad_pos,ant,cb,a ->
     case cb of {CPos => ""; _ => "not"} ++
-    case ant of {
+    case ant.ant of {
       Simul => case typ of {
                  VVAux => vp.ad ! a ++ vp.inf ;
                  VVInf => case ad_pos of {            ---- this is the "split infinitive"
@@ -538,10 +543,10 @@ param
                  _ => vp.ad ! a ++ vp.prp
                }
       ; Anter => case typ of {                                    --# notpresent
-                 VVAux => "have" ++ vp.ad ! a ++ vp.ptp ;                --# notpresent
+                 VVAux => ant.have ++ vp.ad ! a ++ vp.ptp ;                --# notpresent
                  VVInf => case ad_pos of {                                   --# notpresent
-                             True  => vp.ad ! a ++ "to" ++ "have" ++ vp.ptp ;        --# notpresent
-                             False => "to" ++ "have" ++ vp.ad ! a ++ vp.ptp          --# notpresent
+                             True  => vp.ad ! a ++ "to" ++ ant.have ++ vp.ptp ;        --# notpresent
+                             False => "to" ++ ant.have ++ vp.ad ! a ++ vp.ptp          --# notpresent
                           } ;                                                --# notpresent
                  _     => "having" ++ vp.ad ! a ++ vp.ptp                 --# notpresent
                }                                                       --# notpresent
