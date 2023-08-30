@@ -75,7 +75,8 @@ concrete ExtraEng of ExtraEngAbs = CatEng **
     MkVPS t p vp = {
       s = \\a =>
             let
-              verb = mkVerbForms a vp t.t t.a p.p oDir a ;
+              anter = { ant = t.a; have = t.have }; -- TODO: Refactor
+              verb = mkVerbForms a vp t.t anter p.p oDir a ;
               verbf = verb.aux ++ verb.adv ++ verb.fin ++ verb.inf ;
             in t.s ++ p.s ++ vp.ad ! a ++ verbf ++ vp.p ++ vp.s2 ! a ++ vp.ext
       } ;
@@ -238,7 +239,8 @@ lin
         let
           subj  = np.s ! npNom ;
           agr   = np.a ;
-          verb  = mkVerbForms agr vp t a b o agr ;
+          anter = { ant = a; have = case a of { Simul => ""; Anter => "have"} };
+          verb  = mkVerbForms agr vp t anter b o agr ;
           compl = vp.s2 ! agr
         in
         case o of {
@@ -252,7 +254,8 @@ lin
         let
           subj  = np.s ! npNom ;
           agr   = np.a ;
-          verb  = mkVerbForms agr vp t a b o agr ;
+          anter = { ant = a; have = case a of { Simul => ""; Anter => "have"} };
+          verb  = mkVerbForms agr vp t anter b o agr ;
           compl = vp.s2 ! agr
         in
         case o of {

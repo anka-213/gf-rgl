@@ -252,7 +252,7 @@ param
     {ant : Anteriority; have : Str } ;
 
   VerbForms : Type =
-    Tense -> Anteriority -> CPolarity -> Order -> Agr ->
+    Tense -> AnteriorityWithStr -> CPolarity -> Order -> Agr ->
       {aux, adv, fin, inf : Str} ; -- would, not, sleeps, slept
 
 {- IL 2022-04: reduce the fields in VP and make the grammar better suited for morphological analysis
@@ -363,7 +363,7 @@ param
                                 ,past --# notpresent
                                 ->
     \tns,ant,pol,ord,agr ->
-      case <tns,ant,pol,ord> of {
+      case <tns,ant.ant,pol,ord> of {
         <Pres,Simul,CPos,ODir _>      => vff            fin [] ;
         <Pres,Simul,CPos,OQuest>      => vf (does agr)   inf ;
         <Pres,Anter,CPos,ODir True>   => vf (haveContr agr)   part ; --# notpresent
@@ -410,7 +410,7 @@ param
         cfinp = verb.contr ! Pos ! agr ;
         part = verb.ppart ;
       in
-      case <t,ant,cb,ord> of {
+      case <t,ant.ant,cb,ord> of {
         <Pres,Anter,CPos,ODir True>   => vf (haveContr agr)   part ; --# notpresent
         <Pres,Anter,CPos,_>           => vf (have      agr)   part ; --# notpresent
         <Pres,Anter,CNeg c,ODir True> => vfn c (haveContr agr) (haventContr agr) part ; --# notpresent
@@ -633,7 +633,8 @@ param
     \subj,agr,vp -> {
       s = \\t,a,b,o =>
         let
-          verb  = mkVerbForms agr vp t a b o agr ;
+          anter = { ant = a; have = case a of { Simul => ""; Anter => "have"} };
+          verb  = mkVerbForms agr vp t anter b o agr ;
           compl = vp.s2 ! agr ++ vp.ext
         in
         case o of {
