@@ -427,7 +427,7 @@ param
         <Fut, Anter,CPos,ODir True>   => vf (cBind "ll")       (ant.have ++ part) ; --# notpresent
         <Fut, Anter,CPos,_>           => vf "will"       (ant.have ++ part) ; --# notpresent
         <Fut, Anter,CNeg c,ODir True> => vfn c (cBind "ll") (cBind "ll not") (ant.have ++ part) ; --# notpresent
-        <Fut, Anter,CNeg c,_>         => vfn c "will" "won't"(ant.have ++ part) ; --# notpresent
+        <Fut, Anter,CNeg c,_>         => vfn c "will" "won't" (ant.have ++ part) ; --# notpresent
         <Cond,Simul,CPos,ODir True>   => vf (cBind "d")      inf ; --# notpresent
         <Cond,Simul,CPos,_>           => vf "would"      inf ; --# notpresent
         <Cond,Simul,CNeg c,ODir True> => vfn c (cBind "d") (cBind "d not")   inf ; --# notpresent
