@@ -195,7 +195,7 @@ concrete ExtendEng of Extend =
     mkVPS : Temp -> Pol -> VP -> VPS = \t,p,vp -> lin VPS {
       s = \\o,a =>
         let
-          verb = mkVerbForms a vp ! t.t ! t.a ! p.p ! o ! a ; -- choice of Order determines aux or not
+          verb = mkVerbForms a vp t.t t.a p.p o a ; -- choice of Order determines aux or not
           compl = vp.s2 ! a ++ vp.ext
         in {fin = verb.aux ++ t.s ++ p.s ;
             inf = verb.adv ++ vp.ad ! a ++ verb.fin ++ verb.inf ++ vp.p ++ compl} ;
