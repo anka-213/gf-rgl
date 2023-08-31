@@ -624,15 +624,31 @@ param
     } ;
 
 -- For $Sentence$.
+-- IDEA: Minor changes inside clause
+-- Only a single field for simple have with a param to show how
 
   Clause : Type = {
     s : Tense => Anteriority => CPolarity => Order => Str
     } ;
+  HalfClause : Type = {
+    subj : Str ;
+    agr : Agr ;
+    vp : VP
+    } ;
 
-  mkClause : Str -> Agr -> VP -> Clause =
+  mkHalfClause : Str -> Agr -> VP -> HalfClause =
     \subj,agr,vp -> {
-      s = \\t,a,b,o =>
+      subj = subj ;
+      agr = agr ;
+      vp = vp ;
+    } ;
+
+  clauseToOldClause : HalfClause -> Tense => Anteriority => CPolarity => Order => Str = \cl ->
+      \\t,a,b,o =>
         let
+          subj = cl.subj;
+          agr = cl.agr;
+          vp = cl.vp;
           anter = { ant = a; have = case a of { Simul => ""; Anter => "have"} };
           verb  = mkVerbForms agr vp t anter b o agr ;
           compl = vp.s2 ! agr ++ vp.ext
@@ -640,10 +656,13 @@ param
         case o of {
           ODir _ => subj ++ verb.aux ++ verb.adv ++ vp.ad ! agr ++ verb.fin ++ verb.inf ++ vp.p ++ compl ;
           OQuest => verb.aux ++ subj ++ verb.adv ++ vp.ad ! agr ++ verb.fin ++ verb.inf ++ vp.p ++ compl
-          }
-    } ;
+          } ;
+  mkClause : Str -> Agr -> VP -> Clause =
+    \subj,agr,vp -> { s = clauseToOldClause (mkHalfClause subj agr vp) };
 
 -- for pos/neg variation other than negation word, e.g. "there is a car"/"there is no car"
+   -- TODO: Actually do this
+  --  posNegClause : Clause -> Clause -> Clause = \pos,neg -> pos ;
    posNegClause : Clause -> Clause -> Clause = \pos,neg -> {
      s = \\t,a,b,o => case b of {
          CPos  => pos.s ! t ! a ! b ! o ;
@@ -685,6 +704,7 @@ param
       {
       s = \\t,a,p =>
             let
+              -- cl1  = clauseToOldClause cl;
               cls = cl.s ! t ! a ! p ;
               why = wh.s
             in table {
