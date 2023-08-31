@@ -363,37 +363,36 @@ param
                                 ,past --# notpresent
                                 ->
     \tns,ant,pol,ord,agr ->
+      let
+        partInf = case ant.ant of { Simul => inf; Anter => part };
+        mbHave : Str = case <tns, ant.ant> of {
+          <Fut | Cond, Anter> => ant.have;
+          <_, _> => []
+          };
+      in
       case <tns,ant.ant,pol,ord> of {
         <Pres,Simul,CPos,ODir _>      => vff            fin [] ;
-        <Pres,Simul,CPos,OQuest>      => vf (does agr)   inf ;
-        <Pres,Anter,CPos,ODir True>   => vf (haveContr agr)   part ; --# notpresent
-        <Pres,Anter,CPos,_>           => vf (have      agr)   part ; --# notpresent
-        <Pres,Anter,CNeg c,ODir True> => vfn c (haveContr agr) (haventContr agr) part ; --# notpresent
-        <Pres,Anter,CNeg c,_>         => vfn c (have agr) (havent agr) part ; --# notpresent
-        <Past,Simul,CPos,ODir _>      => vff past [] ; --# notpresent
-        <Past,Simul,CPos,OQuest>      => vf "did"        inf ; --# notpresent
-        <Past,Simul,CNeg c,_>         => vfn c "did" "didn't"     inf ; --# notpresent
-        <Past,Anter,CPos,ODir True>   => vf (cBind "d")         part ; --# notpresent
-        <Past,Anter,CPos,_>           => vf "had"        part ; --# notpresent
-        <Past,Anter,CNeg c,ODir True> => vfn c (cBind "d") (cBind "d not")     part ; --# notpresent
-        <Past,Anter,CNeg c,_>         => vfn c "had" "hadn't"     part ; --# notpresent
-        <Fut, Simul,CPos,ODir True>   => vf (cBind "ll")       inf ; --# notpresent
-        <Fut, Simul,CPos,_>           => vf "will"       inf ; --# notpresent
-        <Fut, Simul,CNeg c,ODir True> => vfn c (cBind "ll") (cBind "ll not")      inf ; --# notpresent
-        <Fut, Simul,CNeg c,_>         => vfn c "will" "won't"      inf ; --# notpresent
-        <Fut, Anter,CPos,ODir True>   => vf (cBind "ll")       (ant.have ++ part) ; --# notpresent
-        <Fut, Anter,CPos,_>           => vf "will"       (ant.have ++ part) ; --# notpresent
-        <Fut, Anter,CNeg c,ODir True> => vfn c (cBind "ll") (cBind "ll not") (ant.have ++ part) ; --# notpresent
-        <Fut, Anter,CNeg c,_>         => vfn c "will" "won't" (ant.have ++ part) ; --# notpresent
-        <Cond,Simul,CPos,ODir True>   => vf (cBind "d")      inf ; --# notpresent
-        <Cond,Simul,CPos,_>           => vf "would"      inf ; --# notpresent
-        <Cond,Simul,CNeg c,ODir True> => vfn c (cBind "d") (cBind "d not")   inf ; --# notpresent
-        <Cond,Simul,CNeg c,_>         => vfn c "would" "wouldn't"   inf ; --# notpresent
-        <Cond,Anter,CPos,ODir True>   => vf (cBind "d")      (ant.have ++ part) ; --# notpresent
-        <Cond,Anter,CPos,_>           => vf "would"      (ant.have ++ part) ; --# notpresent
-        <Cond,Anter,CNeg c,ODir True> => vfn c (cBind "d") (cBind "d not") (ant.have ++ part) ; --# notpresent
-        <Cond,Anter,CNeg c,_>         => vfn c "would" "wouldn't" (ant.have ++ part) ; --# notpresent
-        <Pres,Simul,CNeg c,_>         => vfn c (does agr) (doesnt agr) inf
+        <Past,Simul,CPos,ODir _>      => vff           past [] ; --# notpresent
+        <Pres,Simul,CPos,OQuest>      => vf    (does agr)                               partInf  ;
+        <Pres,Simul,CNeg c,_>         => vfn c (does agr)   (doesnt agr)                partInf  ;
+        <Pres,Anter,CPos,ODir True>   => vf    (haveContr agr)                          partInf  ; --# notpresent
+        <Pres,Anter,CPos,_>           => vf    (have      agr)                          partInf  ; --# notpresent
+        <Pres,Anter,CNeg c,ODir True> => vfn c (haveContr agr) (haventContr agr)        partInf  ; --# notpresent
+        <Pres,Anter,CNeg c,_>         => vfn c (have agr)   (havent agr)                partInf  ; --# notpresent
+        <Past,Anter,CPos,ODir True>   => vf    (cBind "d")                              partInf  ; --# notpresent
+        <Past,Simul,CPos,OQuest>      => vf    "did"                                    partInf  ; --# notpresent
+        <Past,Anter,CPos,_>           => vf    "had"                                    partInf  ; --# notpresent
+        <Past,Simul,CNeg c,_>         => vfn c "did"        "didn't"                    partInf  ; --# notpresent
+        <Past,Anter,CNeg c,ODir True> => vfn c (cBind "d")  (cBind "d not")             partInf  ; --# notpresent
+        <Past,Anter,CNeg c,_>         => vfn c "had"        "hadn't"                    partInf  ; --# notpresent
+        <Fut,     _,CPos,ODir True>   => vf    (cBind "ll")                  (mbHave ++ partInf) ; --# notpresent
+        <Fut,     _,CNeg c,ODir True> => vfn c (cBind "ll") (cBind "ll not") (mbHave ++ partInf) ; --# notpresent
+        <Fut,     _,CPos,_>           => vf    "will"                        (mbHave ++ partInf) ; --# notpresent
+        <Fut,     _,CNeg c,_>         => vfn c "will"       "won't"          (mbHave ++ partInf) ; --# notpresent
+        <Cond,    _,CPos,ODir True>   => vf    (cBind "d")                   (mbHave ++ partInf) ; --# notpresent
+        <Cond,    _,CNeg c,ODir True> => vfn c (cBind "d")  (cBind "d not")  (mbHave ++ partInf) ; --# notpresent
+        <Cond,    _,CPos,_>           => vf    "would"                       (mbHave ++ partInf) ; --# notpresent
+        <Cond,    _,CNeg c,_>         => vfn c "would"      "wouldn't"       (mbHave ++ partInf)   --# notpresent
         } ;
 
     auxVerbForms : Aux -> VerbForms = \verb ->
@@ -411,31 +410,31 @@ param
         part = verb.ppart ;
       in
       case <t,ant.ant,cb,ord> of {
-        <Pres,Anter,CPos,ODir True>   => vf (haveContr agr)   part ; --# notpresent
-        <Pres,Anter,CPos,_>           => vf (have      agr)   part ; --# notpresent
+        <Pres,Anter,CPos,ODir True>   => vf    (haveContr agr)   part ; --# notpresent
+        <Pres,Anter,CPos,_>           => vf    (have      agr)   part ; --# notpresent
         <Pres,Anter,CNeg c,ODir True> => vfn c (haveContr agr) (haventContr agr) part ; --# notpresent
         <Pres,Anter,CNeg c,_>         => vfn c (have agr) (havent agr) part ; --# notpresent
 
-        <Past,Anter,CPos,ODir True>   => vf (cBind "d")         part ; --# notpresent
-        <Past,Anter,CPos,_>           => vf "had"        part ; --# notpresent
-        <Past,Anter,CNeg c,ODir True> => vfn c (cBind "d") (cBind "d not")     part ; --# notpresent
-        <Past,Anter,CNeg c,_>         => vfn c "had" "hadn't"     part ; --# notpresent
-        <Fut, Simul,CPos,ODir True>   => vf (cBind "ll")       inf ; --# notpresent
-        <Fut, Simul,CPos,_>           => vf "will"       inf ; --# notpresent
+        <Past,Anter,CPos,ODir True>   => vf    (cBind "d")         part ; --# notpresent
+        <Past,Anter,CPos,_>           => vf    "had"        part ; --# notpresent
+        <Past,Anter,CNeg c,ODir True> => vfn c (cBind "d")  (cBind "d not")     part ; --# notpresent
+        <Past,Anter,CNeg c,_>         => vfn c "had"        "hadn't"     part ; --# notpresent
+        <Fut, Simul,CPos,ODir True>   => vf    (cBind "ll")       inf ; --# notpresent
+        <Fut, Simul,CPos,_>           => vf    "will"       inf ; --# notpresent
         <Fut, Simul,CNeg c,ODir True> => vfn c (cBind "ll") (cBind "ll not")      inf ; --# notpresent
-        <Fut, Simul,CNeg c,_>         => vfn c "will" "won't"      inf ; --# notpresent
-        <Fut, Anter,CPos,ODir True>   => vf (cBind "ll")       (ant.have ++ part) ; --# notpresent
-        <Fut, Anter,CPos,_>           => vf "will"       (ant.have ++ part) ; --# notpresent
+        <Fut, Simul,CNeg c,_>         => vfn c "will"       "won't"      inf ; --# notpresent
+        <Fut, Anter,CPos,ODir True>   => vf    (cBind "ll")       (ant.have ++ part) ; --# notpresent
+        <Fut, Anter,CPos,_>           => vf    "will"       (ant.have ++ part) ; --# notpresent
         <Fut, Anter,CNeg c,ODir True> => vfn c (cBind "ll") (cBind "ll not") (ant.have ++ part) ; --# notpresent
-        <Fut, Anter,CNeg c,_>         => vfn c "will" "won't" (ant.have ++ part) ; --# notpresent
-        <Cond,Simul,CPos,ODir True>   => vf (cBind "d")      inf ; --# notpresent
-        <Cond,Simul,CPos,_>           => vf "would"      inf ; --# notpresent
-        <Cond,Simul,CNeg c,ODir True> => vfn c (cBind "d") (cBind "d not")   inf ; --# notpresent
-        <Cond,Simul,CNeg c,_>         => vfn c "would" "wouldn't"   inf ; --# notpresent
-        <Cond,Anter,CPos,ODir True>   => vf (cBind "d")      (ant.have ++ part) ; --# notpresent
-        <Cond,Anter,CPos,_>           => vf "would"      (ant.have ++ part) ; --# notpresent
-        <Cond,Anter,CNeg c,ODir True> => vfn c (cBind "d") (cBind "d not") (ant.have ++ part) ; --# notpresent
-        <Cond,Anter,CNeg c,_>         => vfn c "would" "wouldn't" (ant.have ++ part) ; --# notpresent
+        <Fut, Anter,CNeg c,_>         => vfn c "will"       "won't" (ant.have ++ part) ; --# notpresent
+        <Cond,Simul,CPos,ODir True>   => vf    (cBind "d")      inf ; --# notpresent
+        <Cond,Simul,CPos,_>           => vf    "would"      inf ; --# notpresent
+        <Cond,Simul,CNeg c,ODir True> => vfn c (cBind "d")  (cBind "d not")   inf ; --# notpresent
+        <Cond,Simul,CNeg c,_>         => vfn c "would"      "wouldn't"   inf ; --# notpresent
+        <Cond,Anter,CPos,ODir True>   => vf    (cBind "d")      (ant.have ++ part) ; --# notpresent
+        <Cond,Anter,CPos,_>           => vf    "would"      (ant.have ++ part) ; --# notpresent
+        <Cond,Anter,CNeg c,ODir True> => vfn c (cBind "d")  (cBind "d not") (ant.have ++ part) ; --# notpresent
+        <Cond,Anter,CNeg c,_>         => vfn c "would"      "wouldn't" (ant.have ++ part) ; --# notpresent
 
         <Past,Simul,CPos,  _>    => vf (verb.past ! b ! agr) [] ; --# notpresent
         <Past,Simul,CNeg c,  _> => vfn c (verb.past!Pos!agr)(verb.past!Neg!agr) [] ; --# notpresent
