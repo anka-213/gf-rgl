@@ -405,15 +405,17 @@ param
         <   _,    _> => vf cb (tenseAux t ant.ant agr ord) (mbHave ++ partInf)   --# notpresent
       } ;
 
-  VFAux : Type = {pos, contrNeg : Str}; -- have, had, will, would
-  vfAuxNoCtr : Str -> Str -> Order -> VFAux = \pos,neg -> vfAux pos neg pos neg;
+  VFAux : Type = Polarity => Str; -- have, had, will, would
+  vfAuxNoCtr : Str -> Str -> Order -> VFAux = \pos,neg,ord -> table {Pos => pos; Neg => neg};
   mkVFAux : Str -> Str -> Str -> Order -> VFAux = \pos, neg, contr ->
     vfAux pos neg (cBind contr) (cBind contr ++ "not");
   vfAux : Str -> Str -> Str -> Str -> Order -> VFAux = \pos, neg, contr, contrNeg, ord  ->
     case ord of {
-      ODir True => {pos = contr; contrNeg = contrNeg };
-      _         => {pos = pos;   contrNeg = neg}
+      ODir True => table {Pos => contr; Neg => contrNeg };
+      _         => table {Pos => pos;   Neg => neg}
     };
+  vfContr : VFAux -> VFAux -> Order -> VFAux = \uncontr, contr, ord  ->
+    case ord of { ODir True => contr; _ => uncontr };
 
   -- Only isContraction is needed from order
   tenseAux : Tense -> Anteriority -> Agr -> Order -> VFAux =
@@ -433,9 +435,9 @@ param
   vf : CPolarity -> VFAux -> Str -> {aux, fin, adv, inf : Str} =
     \pol,aux,inf ->
     case pol of {
-      CPos       => {aux = aux.pos ; adv = [] ; fin = [] ; inf = inf} ;
-      CNeg True  => {aux = aux.contrNeg ; adv = [] ; fin = [] ; inf = inf} ;
-      CNeg False => {aux = aux.pos ; adv = "not" ; fin = [] ; inf = inf}
+      CPos       => {aux = aux ! Pos ; adv = [] ; fin = [] ; inf = inf} ;
+      CNeg True  => {aux = aux ! Neg ; adv = [] ; fin = [] ; inf = inf} ;
+      CNeg False => {aux = aux ! Pos ; adv = "not" ; fin = [] ; inf = inf}
     } ;
 
 {- IL 2018-04 To fix scope of reflexives:
