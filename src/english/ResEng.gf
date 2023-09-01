@@ -430,22 +430,15 @@ param
   vff : Str -> Str -> {aux, adv, fin, inf : Str} = \x,y ->
     {aux = [] ; adv = [] ; fin = x ; inf = y} ;
 
-  vf : Str -> Str -> {aux, adv, fin, inf : Str} = \x,y -> vfn True x x y ;
-
   vfy : CPolarity -> VFAux -> Str -> {aux, fin, adv, inf : Str} =
     \pol,aux,inf -> vfx pol aux.pos aux.contrNeg inf ;
   vfx : CPolarity -> Str -> Str -> Str -> {aux, fin, adv, inf : Str} =
     \pol,x,y,z ->
     case pol of {
-      CPos => vf x z ;
-      CNeg c => vfn c x y z
+      CPos       => {aux = x ; adv = [] ; fin = [] ; inf = z} ;
+      CNeg True  => {aux = y ; adv = [] ; fin = [] ; inf = z} ;
+      CNeg False => {aux = x ; adv = "not" ; fin = [] ; inf = z}
     } ;
-  vfn : Bool -> Str -> Str -> Str -> {aux, fin, adv, inf : Str} =
-    \contr,x,y,z ->
-    case contr of {
-      True  => {aux = y ; adv = [] ; fin = [] ; inf = z} ;
-      False => {aux = x ; adv = "not" ; fin = [] ; inf = z}
-      } ;
 
 {- IL 2018-04 To fix scope of reflexives:
   a) ComplSlash ( … ReflVP … ) X:    reflexive should agree with X
