@@ -413,7 +413,7 @@ param
         <Cond,    _,c,_>         => vfy c (vfWould ord) (mbHave ++ partInf) ; --# notpresent
 
         <Past,Simul,c,_>         => vfx c (verb.past!Pos!agr)(verb.past!Neg!agr) [] ; --# notpresent
-        <Pres,Simul,c,ODir True> => vfx c cfinp fin  [] ;
+        <Pres,Simul,c,ODir True> => vfx c cfinp cfin  [] ;
         <Pres,Simul,c,_>         => vfx c finp fin   []
       } ;
 
