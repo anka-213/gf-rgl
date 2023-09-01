@@ -369,30 +369,26 @@ param
           <Fut | Cond, Anter> => ant.have;
           <_, _> => []
           };
+        isContr : Bool = case ord of {
+          ODir True => True ;
+          _         => False
+          };
       in
       case <tns,ant.ant,pol,ord> of {
-        <Pres,Simul,CPos,ODir _>      => vff            fin [] ;
-        <Past,Simul,CPos,ODir _>      => vff           past [] ; --# notpresent
-        <Pres,Simul,CPos,OQuest>      => vf    (does agr)                               partInf  ;
-        <Pres,Simul,CNeg c,_>         => vfn c (does agr)   (doesnt agr)                partInf  ;
-        <Pres,Anter,CPos,ODir True>   => vf    (haveContr agr)                          partInf  ; --# notpresent
-        <Pres,Anter,CPos,_>           => vf    (have      agr)                          partInf  ; --# notpresent
-        <Pres,Anter,CNeg c,ODir True> => vfn c (haveContr agr) (haventContr agr)        partInf  ; --# notpresent
-        <Pres,Anter,CNeg c,_>         => vfn c (have agr)   (havent agr)                partInf  ; --# notpresent
-        <Past,Anter,CPos,ODir True>   => vf    (cBind "d")                              partInf  ; --# notpresent
-        <Past,Simul,CPos,OQuest>      => vf    "did"                                    partInf  ; --# notpresent
-        <Past,Anter,CPos,_>           => vf    "had"                                    partInf  ; --# notpresent
-        <Past,Simul,CNeg c,_>         => vfn c "did"        "didn't"                    partInf  ; --# notpresent
-        <Past,Anter,CNeg c,ODir True> => vfn c (cBind "d")  (cBind "d not")             partInf  ; --# notpresent
-        <Past,Anter,CNeg c,_>         => vfn c "had"        "hadn't"                    partInf  ; --# notpresent
-        <Fut,     _,CPos,ODir True>   => vf    (cBind "ll")                  (mbHave ++ partInf) ; --# notpresent
-        <Fut,     _,CNeg c,ODir True> => vfn c (cBind "ll") (cBind "ll not") (mbHave ++ partInf) ; --# notpresent
-        <Fut,     _,CPos,_>           => vf    "will"                        (mbHave ++ partInf) ; --# notpresent
-        <Fut,     _,CNeg c,_>         => vfn c "will"       "won't"          (mbHave ++ partInf) ; --# notpresent
-        <Cond,    _,CPos,ODir True>   => vf    (cBind "d")                   (mbHave ++ partInf) ; --# notpresent
-        <Cond,    _,CNeg c,ODir True> => vfn c (cBind "d")  (cBind "d not")  (mbHave ++ partInf) ; --# notpresent
-        <Cond,    _,CPos,_>           => vf    "would"                       (mbHave ++ partInf) ; --# notpresent
-        <Cond,    _,CNeg c,_>         => vfn c "would"      "wouldn't"       (mbHave ++ partInf)   --# notpresent
+        <Pres,Simul,CPos,ODir _>      => vff                                            fin   [] ;
+        <Pres,Simul,   c,_>           => vfx c (does agr)   (doesnt agr)                partInf  ;
+        <Pres,Anter,   c,ODir True>   => vfx c (haveContr agr) (haventContr agr)        partInf  ; --# notpresent
+        <Pres,Anter,   c,_>           => vfx c (have agr)   (havent agr)                partInf  ; --# notpresent
+
+        <Past,Simul,CPos,ODir _>      => vff                                            past  [] ; --# notpresent
+        <Past,Simul,   c,_>           => vfx c "did"        "didn't"                    partInf  ; --# notpresent
+        <Past,Anter,   c,ODir True>   => vfx c (cBind "d")  (cBind "d not")             partInf  ; --# notpresent
+        <Past,Anter,   c,_>           => vfx c "had"        "hadn't"                    partInf  ; --# notpresent
+
+        <Fut,     _,   c,ODir True>   => vfx c (cBind "ll") (cBind "ll not") (mbHave ++ partInf) ; --# notpresent
+        <Fut,     _,   c,_>           => vfx c "will"       "won't"          (mbHave ++ partInf) ; --# notpresent
+        <Cond,    _,   c,ODir True>   => vfx c (cBind "d")  (cBind "d not")  (mbHave ++ partInf) ; --# notpresent
+        <Cond,    _,   c,_>           => vfx c "would"      "wouldn't"       (mbHave ++ partInf)   --# notpresent
         } ;
 
     auxVerbForms : Aux -> VerbForms = \verb ->
@@ -449,6 +445,12 @@ param
 
   vf : Str -> Str -> {aux, adv, fin, inf : Str} = \x,y -> vfn True x x y ;
 
+  vfx : CPolarity -> Str -> Str -> Str -> {aux, fin, adv, inf : Str} =
+    \pol,x,y,z ->
+    case pol of {
+      CPos => vf x z ;
+      CNeg c => vfn c x y z
+    } ;
   vfn : Bool -> Str -> Str -> Str -> {aux, fin, adv, inf : Str} =
     \contr,x,y,z ->
     case contr of {
