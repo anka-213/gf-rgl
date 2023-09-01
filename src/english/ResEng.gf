@@ -405,40 +405,26 @@ param
         cfin  = verb.contr ! b ! agr ;
         cfinp = verb.contr ! Pos ! agr ;
         part = verb.ppart ;
+        partInf = case ant.ant of { Simul => inf; Anter => part };
+        mbHave : Str = case <t, ant.ant> of {
+          <Fut | Cond, Anter> => ant.have;
+          <_, _> => []
+          };
       in
       case <t,ant.ant,cb,ord> of {
-        <Pres,Anter,CPos,ODir True>   => vf    (haveContr agr)   part ; --# notpresent
-        <Pres,Anter,CPos,_>           => vf    (have      agr)   part ; --# notpresent
-        <Pres,Anter,CNeg c,ODir True> => vfn c (haveContr agr) (haventContr agr) part ; --# notpresent
-        <Pres,Anter,CNeg c,_>         => vfn c (have agr) (havent agr) part ; --# notpresent
+        <Pres,Anter,   c,ODir True>   => vfx c (haveContr agr) (haventContr agr) part ; --# notpresent
+        <Pres,Anter,   c,_>           => vfx c (have agr) (havent agr) part ; --# notpresent
 
-        <Past,Anter,CPos,ODir True>   => vf    (cBind "d")         part ; --# notpresent
-        <Past,Anter,CPos,_>           => vf    "had"        part ; --# notpresent
-        <Past,Anter,CNeg c,ODir True> => vfn c (cBind "d")  (cBind "d not")     part ; --# notpresent
-        <Past,Anter,CNeg c,_>         => vfn c "had"        "hadn't"     part ; --# notpresent
-        <Fut, Simul,CPos,ODir True>   => vf    (cBind "ll")       inf ; --# notpresent
-        <Fut, Simul,CPos,_>           => vf    "will"       inf ; --# notpresent
-        <Fut, Simul,CNeg c,ODir True> => vfn c (cBind "ll") (cBind "ll not")      inf ; --# notpresent
-        <Fut, Simul,CNeg c,_>         => vfn c "will"       "won't"      inf ; --# notpresent
-        <Fut, Anter,CPos,ODir True>   => vf    (cBind "ll")       (ant.have ++ part) ; --# notpresent
-        <Fut, Anter,CPos,_>           => vf    "will"       (ant.have ++ part) ; --# notpresent
-        <Fut, Anter,CNeg c,ODir True> => vfn c (cBind "ll") (cBind "ll not") (ant.have ++ part) ; --# notpresent
-        <Fut, Anter,CNeg c,_>         => vfn c "will"       "won't" (ant.have ++ part) ; --# notpresent
-        <Cond,Simul,CPos,ODir True>   => vf    (cBind "d")      inf ; --# notpresent
-        <Cond,Simul,CPos,_>           => vf    "would"      inf ; --# notpresent
-        <Cond,Simul,CNeg c,ODir True> => vfn c (cBind "d")  (cBind "d not")   inf ; --# notpresent
-        <Cond,Simul,CNeg c,_>         => vfn c "would"      "wouldn't"   inf ; --# notpresent
-        <Cond,Anter,CPos,ODir True>   => vf    (cBind "d")      (ant.have ++ part) ; --# notpresent
-        <Cond,Anter,CPos,_>           => vf    "would"      (ant.have ++ part) ; --# notpresent
-        <Cond,Anter,CNeg c,ODir True> => vfn c (cBind "d")  (cBind "d not") (ant.have ++ part) ; --# notpresent
-        <Cond,Anter,CNeg c,_>         => vfn c "would"      "wouldn't" (ant.have ++ part) ; --# notpresent
+        <Past,Anter,   c,ODir True>   => vfx c (cBind "d")  (cBind "d not")     part ; --# notpresent
+        <Past,Anter,   c,_>           => vfx c "had"        "hadn't"     part ; --# notpresent
+        <Fut,     _,   c,ODir True>   => vfx c (cBind "ll") (cBind "ll not") (mbHave ++ partInf) ; --# notpresent
+        <Fut,     _,   c,_>           => vfx c "will"       "won't" (mbHave ++ partInf) ; --# notpresent
+        <Cond,    _,   c,ODir True>   => vfx c (cBind "d")  (cBind "d not") (mbHave ++ partInf) ; --# notpresent
+        <Cond,    _,   c,_>           => vfx c "would"      "wouldn't" (mbHave ++ partInf) ; --# notpresent
 
-        <Past,Simul,CPos,  _>    => vf (verb.past ! b ! agr) [] ; --# notpresent
-        <Past,Simul,CNeg c,  _> => vfn c (verb.past!Pos!agr)(verb.past!Neg!agr) [] ; --# notpresent
-        <Pres,Simul,CPos, ODir True>  => vf cfin          [] ;
-        <Pres,Simul,CPos,  _>         => vf fin           [] ;
-        <Pres,Simul,CNeg c,ODir True> => vfn c cfinp fin  [] ;
-        <Pres,Simul,CNeg c,  _>       => vfn c finp fin   []
+        <Past,Simul,   c,  _>    => vfx c (verb.past!Pos!agr)(verb.past!Neg!agr) [] ; --# notpresent
+        <Pres,Simul,   c,ODir True> => vfx c cfinp fin  [] ;
+        <Pres,Simul,   c,  _>       => vfx c finp fin   []
       } ;
 
   vff : Str -> Str -> {aux, adv, fin, inf : Str} = \x,y ->
