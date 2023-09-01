@@ -377,7 +377,7 @@ param
       case <tns,ant.ant,pol,ord> of {
         <Pres,Simul,CPos,ODir _> => vff fin  [] ;
         <Past,Simul,CPos,ODir _> => vff past [] ; --# notpresent
-        <_,_,_,_> => vfy pol (tenseAux tns ant.ant agr ord) (mbHave ++ partInf) --# notpresent
+        <_,_,_,_> => vf pol (tenseAux tns ant.ant agr ord) (mbHave ++ partInf) --# notpresent
         } ;
 
     auxVerbForms : Aux -> VerbForms = \verb ->
@@ -400,9 +400,9 @@ param
           };
       in
       case <t,ant.ant> of {
-        <Past,Simul> => vfx cb (verb.past!Pos!agr)(verb.past!Neg!agr) [] ; --# notpresent
-        <Pres,Simul> => vfy cb (vfAux finp fin cfinp cfin ord) [] ;
-        <   _,    _> => vfy cb (tenseAux t ant.ant agr ord) (mbHave ++ partInf)   --# notpresent
+        <Past,Simul> => vf cb (vfAuxNoCtr (verb.past!Pos!agr) (verb.past!Neg!agr) ord) [] ; --# notpresent
+        <Pres,Simul> => vf cb (vfAux finp fin cfinp cfin ord) [] ;
+        <   _,    _> => vf cb (tenseAux t ant.ant agr ord) (mbHave ++ partInf)   --# notpresent
       } ;
 
   VFAux : Type = {pos, contrNeg : Str}; -- have, had, will, would
@@ -430,14 +430,12 @@ param
   vff : Str -> Str -> {aux, adv, fin, inf : Str} = \x,y ->
     {aux = [] ; adv = [] ; fin = x ; inf = y} ;
 
-  vfy : CPolarity -> VFAux -> Str -> {aux, fin, adv, inf : Str} =
-    \pol,aux,inf -> vfx pol aux.pos aux.contrNeg inf ;
-  vfx : CPolarity -> Str -> Str -> Str -> {aux, fin, adv, inf : Str} =
-    \pol,x,y,z ->
+  vf : CPolarity -> VFAux -> Str -> {aux, fin, adv, inf : Str} =
+    \pol,aux,inf ->
     case pol of {
-      CPos       => {aux = x ; adv = [] ; fin = [] ; inf = z} ;
-      CNeg True  => {aux = y ; adv = [] ; fin = [] ; inf = z} ;
-      CNeg False => {aux = x ; adv = "not" ; fin = [] ; inf = z}
+      CPos       => {aux = aux.pos ; adv = [] ; fin = [] ; inf = inf} ;
+      CNeg True  => {aux = aux.contrNeg ; adv = [] ; fin = [] ; inf = inf} ;
+      CNeg False => {aux = aux.pos ; adv = "not" ; fin = [] ; inf = inf}
     } ;
 
 {- IL 2018-04 To fix scope of reflexives:
