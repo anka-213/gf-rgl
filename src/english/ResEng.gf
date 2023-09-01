@@ -375,15 +375,9 @@ param
           };
       in
       case <tns,ant.ant,pol,ord> of {
-        <Pres,Simul,CPos,ODir _>      => vff                                            fin   [] ;
-        <Pres,Simul,   c,_>           => vfx c (does agr)   (doesnt agr)                partInf  ;
-        <Pres,Anter,   c,_>           => vfy c (vfHave agr ord)                         partInf  ; --# notpresent
-
-        <Past,Simul,CPos,ODir _>      => vff                                            past  [] ; --# notpresent
-        <Past,Simul,   c,_>           => vfx c "did"        "didn't"                    partInf  ; --# notpresent
-        <Past,Anter,   c,_>           => vfy c (vfHad   ord)                            partInf  ; --# notpresent
-        <Fut,     _,   c,_>           => vfy c (vfWill  ord)                 (mbHave ++ partInf) ; --# notpresent
-        <Cond,    _,   c,_>           => vfy c (vfWould ord)                 (mbHave ++ partInf)   --# notpresent
+        <Pres,Simul,CPos,ODir _> => vff fin  [] ;
+        <Past,Simul,CPos,ODir _> => vff past [] ; --# notpresent
+        <_,_,_,_> => vfy pol (tenseAux tns ant.ant agr ord) (mbHave ++ partInf) --# notpresent
         } ;
 
     auxVerbForms : Aux -> VerbForms = \verb ->
@@ -406,17 +400,13 @@ param
           };
       in
       case <t,ant.ant> of {
-        <Pres,Anter> => vfy cb (vfHave agr ord) part ; --# notpresent
-
-        <Past,Anter> => vfy cb (vfHad   ord)    part ; --# notpresent
-        <Fut,     _> => vfy cb (vfWill  ord) (mbHave ++ partInf) ; --# notpresent
-        <Cond,    _> => vfy cb (vfWould ord) (mbHave ++ partInf) ; --# notpresent
-
         <Past,Simul> => vfx cb (verb.past!Pos!agr)(verb.past!Neg!agr) [] ; --# notpresent
-        <Pres,Simul> => vfy cb (vfAux finp fin cfinp cfin ord) []
+        <Pres,Simul> => vfy cb (vfAux finp fin cfinp cfin ord) [] ;
+        <   _,    _> => vfy cb (tenseAux t ant.ant agr ord) (mbHave ++ partInf)   --# notpresent
       } ;
 
   VFAux : Type = {pos, contrNeg : Str}; -- have, had, will, would
+  vfAuxNoCtr : Str -> Str -> Order -> VFAux = \pos,neg -> vfAux pos neg pos neg;
   mkVFAux : Str -> Str -> Str -> Order -> VFAux = \pos, neg, contr ->
     vfAux pos neg (cBind contr) (cBind contr ++ "not");
   vfAux : Str -> Str -> Str -> Str -> Order -> VFAux = \pos, neg, contr, contrNeg, ord  ->
@@ -424,10 +414,18 @@ param
       ODir True => {pos = contr; contrNeg = contrNeg };
       _         => {pos = pos;   contrNeg = neg}
     };
-  vfHave : Agr -> Order -> VFAux = \agr -> vfAux (have agr) (havent agr) (haveContr agr) (haventContr agr) ;
-  vfHad   = mkVFAux "had"   "hadn't"   "d"  ;
-  vfWill  = mkVFAux "will"  "won't"    "ll" ;
-  vfWould = mkVFAux "would" "wouldn't"  "d" ;
+
+  -- Only isContraction is needed from order
+  tenseAux : Tense -> Anteriority -> Agr -> Order -> VFAux =
+    \tns,ant,agr ->
+      case <tns,ant> of {
+        <Pres,Simul> => vfAuxNoCtr (does agr) (doesnt agr) ;
+        <Pres,Anter> => vfAux (have agr) (havent agr) (haveContr agr) (haventContr agr) ; --# notpresent
+        <Past,Simul> => vfAuxNoCtr "did" "didn't"       ; --# notpresent
+        <Past,Anter> => mkVFAux "had"   "hadn't"   "d"  ; --# notpresent
+        <Fut,     _> => mkVFAux "will"  "won't"    "ll" ; --# notpresent
+        <Cond,    _> => mkVFAux "would" "wouldn't" "d"    --# notpresent
+      } ;
 
   vff : Str -> Str -> {aux, adv, fin, inf : Str} = \x,y ->
     {aux = [] ; adv = [] ; fin = x ; inf = y} ;
