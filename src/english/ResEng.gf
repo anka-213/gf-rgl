@@ -373,6 +373,11 @@ param
           ODir True => True ;
           _         => False
           };
+        mkAux : Str -> Str -> Str -> {pos, contrNeg : Str} = \pos, contr, contrNeg  ->
+          case isContr of {
+            True => {pos = cBind contr; contrNeg = cBind contr ++ "not"};
+            False => {pos = pos; contrNeg = contrNeg}
+          };
       in
       case <tns,ant.ant,pol,ord> of {
         <Pres,Simul,CPos,ODir _>      => vff                                            fin   [] ;
@@ -382,13 +387,9 @@ param
 
         <Past,Simul,CPos,ODir _>      => vff                                            past  [] ; --# notpresent
         <Past,Simul,   c,_>           => vfx c "did"        "didn't"                    partInf  ; --# notpresent
-        <Past,Anter,   c,ODir True>   => vfx c (cBind "d")  (cBind "d not")             partInf  ; --# notpresent
-        <Past,Anter,   c,_>           => vfx c "had"        "hadn't"                    partInf  ; --# notpresent
-
-        <Fut,     _,   c,ODir True>   => vfx c (cBind "ll") (cBind "ll not") (mbHave ++ partInf) ; --# notpresent
-        <Fut,     _,   c,_>           => vfx c "will"       "won't"          (mbHave ++ partInf) ; --# notpresent
-        <Cond,    _,   c,ODir True>   => vfx c (cBind "d")  (cBind "d not")  (mbHave ++ partInf) ; --# notpresent
-        <Cond,    _,   c,_>           => vfx c "would"      "wouldn't"       (mbHave ++ partInf)   --# notpresent
+        <Past,Anter,   c,_>           => vfy c (mkAux "had"  "d"  "hadn't")             partInf  ; --# notpresent
+        <Fut,     _,   c,_>           => vfy c (mkAux "will" "ll" "won't")   (mbHave ++ partInf) ; --# notpresent
+        <Cond,    _,   c,_>           => vfy c (mkAux "would" "d" "wouldn't") (mbHave ++ partInf)  --# notpresent
         } ;
 
     auxVerbForms : Aux -> VerbForms = \verb ->
@@ -445,6 +446,8 @@ param
 
   vf : Str -> Str -> {aux, adv, fin, inf : Str} = \x,y -> vfn True x x y ;
 
+  vfy : CPolarity -> {pos, contrNeg : Str} -> Str -> {aux, fin, adv, inf : Str} =
+    \pol,aux,inf -> vfx pol aux.pos aux.contrNeg inf ;
   vfx : CPolarity -> Str -> Str -> Str -> {aux, fin, adv, inf : Str} =
     \pol,x,y,z ->
     case pol of {
