@@ -405,16 +405,15 @@ param
           <_, _> => []
           };
       in
-      case <t,ant.ant,cb,ord> of {
-        <Pres,Anter,c,_>         => vfy c (vfHave agr ord) part ; --# notpresent
+      case <t,ant.ant> of {
+        <Pres,Anter> => vfy cb (vfHave agr ord) part ; --# notpresent
 
-        <Past,Anter,c,_>         => vfy c (vfHad   ord)    part ; --# notpresent
-        <Fut,     _,c,_>         => vfy c (vfWill  ord) (mbHave ++ partInf) ; --# notpresent
-        <Cond,    _,c,_>         => vfy c (vfWould ord) (mbHave ++ partInf) ; --# notpresent
+        <Past,Anter> => vfy cb (vfHad   ord)    part ; --# notpresent
+        <Fut,     _> => vfy cb (vfWill  ord) (mbHave ++ partInf) ; --# notpresent
+        <Cond,    _> => vfy cb (vfWould ord) (mbHave ++ partInf) ; --# notpresent
 
-        <Past,Simul,c,_>         => vfx c (verb.past!Pos!agr)(verb.past!Neg!agr) [] ; --# notpresent
-        <Pres,Simul,c,ODir True> => vfx c cfinp cfin  [] ;
-        <Pres,Simul,c,_>         => vfx c finp fin   []
+        <Past,Simul> => vfx cb (verb.past!Pos!agr)(verb.past!Neg!agr) [] ; --# notpresent
+        <Pres,Simul> => vfy cb (vfAux finp fin cfinp cfin ord) []
       } ;
 
   VFAux : Type = {pos, contrNeg : Str}; -- have, had, will, would
