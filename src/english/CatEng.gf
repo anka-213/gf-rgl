@@ -7,7 +7,8 @@ concrete CatEng of Cat = CommonX - [Pol,CAdv,Temp,Ant] ** open ResEng, Prelude i
     -- Copied to be able to add extra data
     -- Lindef & linref?
     Ant   = {s : Str ; a : Anteriority; have : Str} ;
-    Temp  = {s : Str ; t : Tense ; a : Anteriority; have : Str} ;
+    -- Tense = {s : Str ; t : Tense} ;
+    Temp  = {s : Str ; t : Tense ; a : Anteriority; have : Str; aux : Agr => Bool => Polarity => Str} ;
 
 -- exception to CommonX, due to the distinction contracted/uncontracted negation
 

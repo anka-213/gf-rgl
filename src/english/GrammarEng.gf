@@ -25,7 +25,7 @@ lin
   PNeg = {s = [] ; p = CNeg True} ; -- contracted: don't
   ASimul = {s = []} ** {a = Simul; have = ""} ;
   AAnter = {s = []} ** {a = Anter; have = "have"} ;
-  TTAnt t a = {s = t.s ++ a.s ; t = t.t ; a = a.a; have = a.have} ;
+  TTAnt t a = {s = t.s ++ a.s ; t = t.t ; a = a.a; have = a.have ; aux = tenseAux t.t a.a } ;
 
 
 } ;
