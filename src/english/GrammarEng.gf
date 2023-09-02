@@ -11,10 +11,11 @@ concrete GrammarEng of Grammar =
   RelativeEng,
   ConjunctionEng,
   PhraseEng,
-  TextX - [Pol,PPos,PNeg,SC,CAdv,Temp,Ant,AAnter],
+  TextX - [Pol,PPos,PNeg,SC,CAdv,Temp,Tense,Ant,AAnter],
   StructuralEng,
   IdiomEng,
-  TenseX - [Pol,PPos,PNeg,SC,CAdv,Temp,Ant,ASimul,AAnter,TTAnt],
+  TenseX - [Pol,PPos,PNeg,SC,CAdv,Temp,Tense,Ant,ASimul,AAnter
+           ,TTAnt,TPres,TPast,TFut,TCond],
   NamesEng
   ** open ResEng, Prelude in {
 
@@ -25,7 +26,11 @@ lin
   PNeg = {s = [] ; p = CNeg True} ; -- contracted: don't
   ASimul = {s = []} ** {a = Simul; have = ""} ;
   AAnter = {s = []} ** {a = Anter; have = "have"} ;
-  TTAnt t a = {s = t.s ++ a.s ; t = t.t ; a = a.a; have = a.have ; aux = tenseAux t.t a.a } ;
+  TPres = {s = []} ** tPres ;
+  TPast = {s = []} ** tPast ;   --# notpresent
+  TFut  = {s = []} ** tFut  ;   --# notpresent
+  TCond = {s = []} ** tCond ;   --# notpresent
+  TTAnt t a = {s = t.s ++ a.s ; t = t.t ; a = a.a; have = a.have ; aux = t.aux ! a.a } ;
 
 
 } ;

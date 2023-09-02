@@ -1,4 +1,4 @@
-concrete CatEng of Cat = CommonX - [Pol,CAdv,Temp,Ant] ** open ResEng, Prelude in {
+concrete CatEng of Cat = CommonX - [Pol,CAdv,Temp,Ant,Tense] ** open ResEng, (R = ParamX), Prelude in {
 
   flags optimize=all_subs ;
 
@@ -7,8 +7,8 @@ concrete CatEng of Cat = CommonX - [Pol,CAdv,Temp,Ant] ** open ResEng, Prelude i
     -- Copied to be able to add extra data
     -- Lindef & linref?
     Ant   = {s : Str ; a : Anteriority; have : Str} ;
-    -- Tense = {s : Str ; t : Tense} ;
-    Temp  = {s : Str ; t : Tense ; a : Anteriority; have : Str; aux : Agr => Bool => Polarity => Str} ;
+    Tense = {s : Str} ** TenseAux ;
+    Temp  = {s : Str ; t : R.Tense ; a : Anteriority; have : Str; aux : Polarity => Bool => Agr => Str} ;
 
 -- exception to CommonX, due to the distinction contracted/uncontracted negation
 
