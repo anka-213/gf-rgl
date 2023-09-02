@@ -410,15 +410,28 @@ param
     _         => False
     };
 
+  TenseAux : Type = {t : Tense; aux : Anteriority => Polarity => Bool => Agr => Str} ;
+  -- tPres : TenseAux = {t = Pres ;}
+  tPres : TenseAux = {t = Pres ; aux = \\ant,pol,ctr,agr =>
+    case ant of {
+        Simul => posneg pol (does agr) ;
+        Anter => vfAux (have agr) (havent agr) (haveContr agr) (haventContr agr)  ctr ! pol --# notpresent
+    } } ;
+  tPast : TenseAux = {t = Past ; aux = \\ant,pol,ctr,agr =>   --# notpresent
+    case ant of {
+        Simul => posneg pol "did" ; --# notpresent
+        Anter => mkVFAux "had" "hadn't" "d"  ctr ! pol --# notpresent
+    } } ; --# notpresent
+  tFut  : TenseAux = {t = Fut  ; aux = \\ant,pol,ctr,agr => mkVFAux "will"  "won't"    "ll" ctr ! pol} ; --notpresent
+  tCond : TenseAux = {t = Cond ; aux = \\ant,pol,ctr,agr => mkVFAux "would" "wouldn't" "d"  ctr ! pol} ; --notpresent
+
   tenseAux : Tense -> Anteriority -> Agr => Bool => VFAux =
-    \tns,ant -> \\agr,isContr =>
-      case <tns,ant> of {
-        <Pres,Simul> => \\b => posneg b (does agr) ;
-        <Pres,Anter> => vfAux (have agr) (havent agr) (haveContr agr) (haventContr agr) isContr ; --# notpresent
-        <Past,Simul> => \\b => posneg b "did"               ; --# notpresent
-        <Past,Anter> => mkVFAux "had"   "hadn't"   "d"  isContr ; --# notpresent
-        <Fut,     _> => mkVFAux "will"  "won't"    "ll" isContr ; --# notpresent
-        <Cond,    _> => mkVFAux "would" "wouldn't" "d"  isContr   --# notpresent
+    \tns,ant -> \\agr,ctr,pol =>
+      case tns of {
+        Pres => tPres.aux ! ant ! pol ! ctr ! agr ;
+        Past => tPast.aux ! ant ! pol ! ctr ! agr ; --# notpresent
+        Fut  => tFut.aux  ! ant ! pol ! ctr ! agr ; --# notpresent
+        Cond => tCond.aux ! ant ! pol ! ctr ! agr    --# notpresent
       } ;
 
   vff : Str -> Str -> {aux, adv, fin, inf : Str} = \x,y ->
