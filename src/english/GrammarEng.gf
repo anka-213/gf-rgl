@@ -25,7 +25,7 @@ lin
   PPos = {s = [] ; p = CPos} ;
   PNeg = {s = [] ; p = CNeg True} ; -- contracted: don't
   ASimul = {s = []} ** {a = Simul; have = ""} ;
-  AAnter = {s = []} ** {a = Anter; have = "have"} ;
+  AAnter = {s = []} ** {a = Anter; have = "have"} ; --# notpresent
   TPres = {s = []} ** tPres ;
   TPast = {s = []} ** tPast ;   --# notpresent
   TFut  = {s = []} ** tFut  ;   --# notpresent

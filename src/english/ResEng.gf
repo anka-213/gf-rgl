@@ -366,14 +366,14 @@ param
       let
         partInf = case ant.ant of { Simul => inf; Anter => part };
         mbHave : Str = case <tns, ant.ant> of {
-          <Fut | Cond, Anter> => ant.have;
+          <Fut | Cond, Anter> => ant.have; --# notpresent
           <_, _> => []
           };
       in
       case <tns,ant.ant,pol,ord> of {
         <Pres,Simul,CPos,ODir _> => vff fin  [] ;
         <Past,Simul,CPos,ODir _> => vff past [] ; --# notpresent
-        <_,_,_,_> => vf pol (tenseAux tns ant.ant ! agr ! isContr ord) (mbHave ++ partInf) --# notpresent
+        <_,_,_,_> => vf pol (tenseAux tns ant.ant ! agr ! isContr ord) (mbHave ++ partInf)
         } ;
 
     auxVerbForms : Aux -> VerbForms = \verb ->
@@ -381,17 +381,17 @@ param
       let
         fin  : Polarity => Str = \\b => verb.pres  ! b ! agr ;
         cfin : Polarity => Str = \\b => verb.contr ! b ! agr ;
-        past : Polarity => Str = \\b => verb.past  ! b ! agr ;
+        past : Polarity => Str = \\b => verb.past  ! b ! agr ; --# notpresent
         partInf = case ant.ant of { Simul => verb.inf; Anter => verb.ppart };
         mbHave : Str = case <t, ant.ant> of {
-          <Fut | Cond, Anter> => ant.have;
+          <Fut | Cond, Anter> => ant.have; --# notpresent
           <_, _> => []
           };
       in
       case <t,ant.ant> of {
         <Past,Simul> => vf cb past [] ; --# notpresent
-        <Pres,Simul> => vf cb (vfContr fin cfin (isContr ord)) [] ;
-        <   _,    _> => vf cb (tenseAux t ant.ant ! agr ! isContr ord) (mbHave ++ partInf)   --# notpresent
+        <Pres,Simul> => vf cb (vfContr fin cfin (isContr ord)) []
+        ; <   _,    _> => vf cb (tenseAux t ant.ant ! agr ! isContr ord) (mbHave ++ partInf) --# notpresent
       } ;
 
   VFAux : Type = Polarity => Str; -- have, had, will, would
@@ -414,24 +414,24 @@ param
   -- tPres : TenseAux = {t = Pres ;}
   tPres : TenseAux = {t = Pres ; aux = \\ant,pol,ctr,agr =>
     case ant of {
-        Simul => posneg pol (does agr) ;
-        Anter => vfAux (have agr) (havent agr) (haveContr agr) (haventContr agr)  ctr ! pol --# notpresent
+        Anter => vfAux (have agr) (havent agr) (haveContr agr) (haventContr agr)  ctr ! pol ; --# notpresent
+        Simul => posneg pol (does agr)
     } } ;
   tPast : TenseAux = {t = Past ; aux = \\ant,pol,ctr,agr =>   --# notpresent
-    case ant of {
+    case ant of { --# notpresent
         Simul => posneg pol "did" ; --# notpresent
         Anter => mkVFAux "had" "hadn't" "d"  ctr ! pol --# notpresent
     } } ; --# notpresent
-  tFut  : TenseAux = {t = Fut  ; aux = \\ant,pol,ctr,agr => mkVFAux "will"  "won't"    "ll" ctr ! pol} ; --notpresent
-  tCond : TenseAux = {t = Cond ; aux = \\ant,pol,ctr,agr => mkVFAux "would" "wouldn't" "d"  ctr ! pol} ; --notpresent
+  tFut  : TenseAux = {t = Fut  ; aux = \\ant,pol,ctr,agr => mkVFAux "will"  "won't"    "ll" ctr ! pol} ; --# notpresent
+  tCond : TenseAux = {t = Cond ; aux = \\ant,pol,ctr,agr => mkVFAux "would" "wouldn't" "d"  ctr ! pol} ; --# notpresent
 
   tenseAux : Tense -> Anteriority -> Agr => Bool => VFAux =
     \tns,ant -> \\agr,ctr,pol =>
       case tns of {
-        Pres => tPres.aux ! ant ! pol ! ctr ! agr ;
         Past => tPast.aux ! ant ! pol ! ctr ! agr ; --# notpresent
         Fut  => tFut.aux  ! ant ! pol ! ctr ! agr ; --# notpresent
-        Cond => tCond.aux ! ant ! pol ! ctr ! agr    --# notpresent
+        Cond => tCond.aux ! ant ! pol ! ctr ! agr ; --# notpresent
+        Pres => tPres.aux ! ant ! pol ! ctr ! agr
       } ;
 
   vff : Str -> Str -> {aux, adv, fin, inf : Str} = \x,y ->
